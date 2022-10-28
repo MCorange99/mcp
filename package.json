@@ -1,0 +1,19 @@
+{
+    "name": "fact-bot",
+    "version": "1.0.0",
+    "main": "target/index.js",
+    "license": "MIT",
+    "dependencies": {
+        "@tsconfig/recommended": "^1.0.1",
+        "@types/node": "^18.7.18",
+        "@types/request": "^2.48.8",
+        "@typescript-eslint/eslint-plugin": "^5.36.1",
+        "@typescript-eslint/parser": "^5.36.1",
+        "axios": "^1.1.2",
+        "discord.js": "^14.5.0",
+        "dotenv": "^16.0.3",
+        "eslint": "^8.23.1",
+        "request": "^2.88.2",
+        "typescript": "^4.8.3"
+    }
+}
