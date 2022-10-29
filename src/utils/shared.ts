@@ -30,5 +30,6 @@ export const OpCode = {
     write_memory: 0x09,
     sum: 0x0A,
     subtract: 0x0B,
-    multiply: 0x0C
+    multiply: 0x0C,
+    syscall: 0x0D,
 };

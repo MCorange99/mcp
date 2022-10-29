@@ -1,6 +1,7 @@
+#!/usr/bin/env node
+
 import { readFileSync } from "fs";
-import { USER_MEM, OpCode, OpAddr, INSTRUCTION_SIZE} from "./shared";
-// import * as p from "./mcpc";
+import { USER_MEM, OpCode, OpAddr, INSTRUCTION_SIZE, run_syscall, magic} from "./utils";
 
 class Runner {
     program: Buffer;
@@ -31,7 +32,7 @@ class Runner {
     }
 
     run() {
-        let i = 0;
+        let i = 7;
         while (i < this.program.byteLength) {
             const op = this.program.readInt8(i);
             const target = this.program.readInt32LE(i + 1);
@@ -83,6 +84,15 @@ class Runner {
             } else
             if (op == OpCode.multiply) {
                 this.set_from_reg_addr(OpAddr.b1, this.get_from_reg_addr(OpAddr.b2) * this.get_from_reg_addr(OpAddr.b3));
+                i += INSTRUCTION_SIZE;
+            } else
+            if (op == OpCode.syscall) {
+                const syscallnum = this.get_from_reg_addr(OpAddr.r1);
+
+                const [registers, mem, ret] = run_syscall(syscallnum, this.registers, this.mem);
+                this.registers = registers;
+                this.mem = mem;
+                this.set_from_reg_addr(OpAddr.r0, ret);
                 i += INSTRUCTION_SIZE;
             }
         }
@@ -171,11 +181,14 @@ function main() {
         encoding: "hex"
     });
     const buff = Buffer.from(bin, "hex");
+    if (!magic.test_magic(buff)) {
+        throw new Error("File is not in MCP format");
+    }
     const runner = new Runner(buff);
     runner.run();
+    console.log();
     console.log(runner.mem);
     console.log(runner.registers);
-    
-
 }
+//console.log([98, 99, 100].map((i) => String.fromCharCode(i)));
 main();

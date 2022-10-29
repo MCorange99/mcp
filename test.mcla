@@ -1,3 +1,9 @@
-mulll 69 69
-movrtr r3 r0
-subrl r0 0xF
+movltm 0x11 97
+movltm 0x12 98
+movltm 0x13 99
+
+; movltr r1 0x02
+; movltr r2 0x01
+; movltr r3 0x11
+; 
+; syscall

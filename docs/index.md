@@ -10,8 +10,8 @@ We use 32 bits for one instruction
 
 first 5 bits is the instruction number
 
-x = instruction number
+i = instruction number
 s = source
 d = destination
 
-`0bxxxxx`
+`0xii`

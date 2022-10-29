@@ -1,13 +1,14 @@
+#!/usr/bin/env node
 import * as fs from "fs";
 
-import { OpAddr, OpCode, UINT32_MAX} from "./shared";
+import { OpAddr, OpCode, UINT32_MAX, comment_remove, magic} from "./utils";
 
 
 
 export class Program {
     program: Buffer;
     constructor(){
-        this.program = Buffer.alloc(0);
+        this.program = magic.build_magic(Buffer.alloc(7));
     }
 
     add_op(opc: OpCode, target: number, source: number) {
@@ -28,7 +29,17 @@ export class Program {
 function main(){
     const filename = process.argv[2];
     const outfile = process.argv[3];
-    const source = fs.readFileSync(filename).toString();
+
+    if (!filename || !outfile) {
+        console.log("usage: mcpc [src_code] [outfile]");
+        process.exit(1);
+    }
+
+    const source = comment_remove(
+        fs.readFileSync(filename).toString(),
+        ";",
+        ["\"", "'"]
+    );
     const lines = source.split("\n");
     const program = new Program(); //! opcode, target, source
     for (const linex in lines) {
@@ -42,6 +53,12 @@ function main(){
                 const source = words[++wx];
                 program.add_op(OpCode.read_literal, 0, parseInt(source));
                 program.add_op(OpCode.write_register, OpAddr[target as keyof typeof OpAddr], 0);
+            } else if ("movltm" == words[wx]){
+
+                const target = words[++wx];
+                const source = words[++wx];
+                program.add_op(OpCode.read_literal, 0, parseInt(source));
+                program.add_op(OpCode.write_memory, parseInt(target), 0);
             } else if ("movrtr" == words[wx]){
 
                 const target: string = words[++wx];
@@ -140,6 +157,9 @@ function main(){
                 program.add_op(OpCode.read_literal3, 0, parseInt(source));
                 program.add_op(OpCode.multiply, 0, 0);
                 program.add_op(OpCode.write_register, OpAddr.r0, 0);
+            } else if ("syscall" == words[wx]) {
+
+                program.add_op(OpCode.syscall, 0, 0);
             }
         }
     
